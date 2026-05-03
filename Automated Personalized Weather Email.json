@@ -1,0 +1,146 @@
+{
+  "name": "Automated Personalized Weather Email",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "f5ee86a6-8183-424c-a1e2-67fa3d180dfc",
+      "name": "Daily 8 AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "cityName": "jaipur"
+      },
+      "id": "cd35d0b0-521b-4aab-ba25-7524c1081310",
+      "name": "Get Weather",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        464,
+        304
+      ],
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "uJkdH8MLwsMGwjEe",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "emailSubject",
+              "value": "=Daily Stand-up & Weather Alert - {{ $now.toFormat(\"MMMM d, yyyy\") }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "emailBody",
+              "value": "=Good morning!\n\n🌤️ Weather Update for {{ $json.name }}:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nTemperature: {{ $json.main.temp }}°C (feels like {{ $json.main.feels_like }}°C)\nConditions: {{ $json.weather[0].description }}\nHumidity: {{ $json.main.humidity }}%\nWind Speed: {{ $json.wind.speed }} m/s\n\n📋 Daily Stand-up Reminder:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n• What did you accomplish yesterday?\n• What are you working on today?\n• Any blockers or challenges?\n\nHave a productive day!\n\n---\nSent automatically at {{ $now.toFormat(\"h:mm a\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2ef4627f-31fb-4774-b335-9bbb85dbc4fc",
+      "name": "Format Daily Update",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "aman76yt@gmail.com",
+        "subject": "={{ $json.emailSubject }}",
+        "emailType": "text",
+        "message": "={{ $json.emailBody }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "452de9e2-3281-4aac-92c8-61c7d7acfdbd",
+      "name": "Send Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        304
+      ],
+      "webhookId": "3285ba03-3a2c-4c00-9e68-0697789fa592",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dy4F14HAqVn7WD85",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily 8 AM Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Weather": {
+      "main": [
+        [
+          {
+            "node": "Format Daily Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Daily Update": {
+      "main": [
+        [
+          {
+            "node": "Send Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3fa1b3d9-b748-4da8-9627-1b89b66877b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "754e6558fc0d22abc819c9dd6a6c7790536352d390efda847075e237a9c266af"
+  },
+  "id": "JI3FjMH34C0gURO8",
+  "tags": []
+}
